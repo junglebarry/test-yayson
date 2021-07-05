@@ -15,11 +15,14 @@ if (!token) {
 
 app.get('/', async (req, res) => {
   try {
-    const data = await getItemData();
-    console.debug(data);
-    const deserialised = store.sync(data);
-    console.debug(deserialised);
-    res.send(deserialised);
+    const itemId = 'ECF45E82-F829-572A-3313-F95B880ECCE3'
+    const data = await getItemData(itemId);
+    const item = store.sync(data);
+    // if you don't do this, there's a circular reference, and that'll hit the buffers with JSON serialisation
+    if (item.list && item.list.all_children) {
+      delete item.list.all_children;
+    }
+    res.send(item);
   } catch (error) {
     console.error(error);
     res.send(error);
@@ -30,11 +33,11 @@ app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })
 
-async function getItemData() {
+async function getItemData(itemId) {
   return new Promise((resolve, reject) => {
     const options = {
       hostname: 'rl.talis.local',
-      path: '/3/life/draft_items/ECF45E82-F829-572A-3313-F95B880ECCE3?include=resource,importance,content,list,resource.part_of',
+      path: `/3/life/draft_items/${itemId}?include=resource,importance,content,list,resource.part_of`,
       headers: {
         Authorization: `Bearer ${token}`
       }
