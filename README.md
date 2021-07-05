@@ -11,3 +11,5 @@ If you don't, do this:
 ```bash
 PERSONA_TOKEN=<a Persona token capable of accessing the TARL local API> node index.js
 ```
+
+Then you can hit <http://localhost:3000> to see the output
